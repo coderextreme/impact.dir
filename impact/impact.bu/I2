@@ -1,0 +1,505 @@
+public class Impact extends JFrame implements WindowListener {
+	Placer p;
+	Selecter s;
+	CreateModule cm;
+	ExpandModule em;
+	Cut ct;
+	Copy cpy;
+	Paste paste;
+	public void init() {
+		getContentPane().setLayout(new BorderLayout());
+		CreateLink cl = new CreateLink();
+		p = new Placer();
+		s = new Selecter(cl);
+		cm = new CreateModule(s, p);
+		em = new ExpandModule(s, p);
+		ct = new Cut(s, p);
+		cpy = new Copy(s, p);
+		paste = new Paste(s, p, cm);
+
+		JMenuBar jmb = new JMenuBar();
+		JMenu jm = new JMenu("File");
+		jmb.add(jm);
+
+		AbstractAction newmach = new AbstractAction() {
+			public void actionPerformed(ActionEvent ae) {
+				System.err.println(getValue(NAME));
+				VisualModule mod = new VisualModule("Main");
+				VisualMachine vm = new VisualMachine(mod, p, s);
+				vm.getFrame().setVisible(true);
+			}
+		};
+		newmach.putValue(Action.NAME, "New Machine");
+		JMenuItem newmachine = new JMenuItem(newmach);
+		jm.add(newmachine);
+
+		AbstractAction openmach = new AbstractAction() {
+			public void actionPerformed(ActionEvent ae) {
+				System.err.println(getValue(NAME));
+				VisualModule mod = new VisualModule("Main");
+				VisualMachine vm = new VisualMachine(mod, p, s);
+				Cell.addCells();
+				InputStream is;
+				try {
+					FileOpenService fos = (FileOpenService)ServiceManager.lookup("javax.jnlp.FileOpenService");
+					FileContents fc = fos.openFileDialog(null, null);
+					is = fc.getInputStream();
+				} catch (Exception e) {
+					try {
+						JFileChooser jfc = new JFileChooser(System.getProperty("user.dir"));
+						int rv = jfc.showOpenDialog(vm);
+						if (rv != JFileChooser.APPROVE_OPTION) {
+							return;
+						}
+						is = new FileInputStream(jfc.getSelectedFile()); 
+					} catch (Exception e2) {
+						e2.printStackTrace();
+						return;
+					}
+				}
+				try {
+					ObjectInputStream ois = new ObjectInputStream(is);
+					Cell.openMachine(ois);
+					ois.close();
+					is.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+					return;
+				}
+				int id = 0;
+				VisualModule [][] modulearray = new VisualModule[Common.PMAXX][Common.PMAXY];
+				for (int y = 0; y < Common.PMAXY; y++) {
+					for (int x = 0; x < Common.PMAXX; x++) {
+						MouseEvent me = new MouseEvent(
+							vm,
+							id++,
+							System.currentTimeMillis(),
+							0, x*150, y*50,
+							1, false);
+									
+						String name = Common.cells[x][y].getPersonality().getClass().getName();
+						modulearray[x][y] = cm.addModule(vm, name, me);
+					}
+				}
+				for (int y = 0; y < Common.PMAXY; y++) {
+					for (int x = 0; x < Common.PMAXX; x++) {
+						if (y < Common.PMAXY-1 && x > 0 && x < Common.PMAXX-1 ) {
+							VisualMachine.link(modulearray[x][y],
+									modulearray[x][y+1],
+									new AcquireLabel("bottom", false),
+									new AcquireLabel("top", false));
+							VisualMachine.link(modulearray[x][y+1],
+									modulearray[x][y],
+									new AcquireLabel("top", false),
+									new AcquireLabel("bottom", false));
+						}
+						if (x < Common.PMAXX-1 && y > 0 && y < Common.PMAXY-1 ) {
+							VisualMachine.link(modulearray[x][y],
+									modulearray[x+1][y],
+									new AcquireLabel("right", false),
+									new AcquireLabel("left", false));
+							VisualMachine.link(modulearray[x+1][y],
+									modulearray[x][y],
+									new AcquireLabel("left", false),
+									new AcquireLabel("right", false));
+						}
+					}
+				}
+				vm.getFrame().setVisible(true);
+			}
+		};
+		openmach.putValue(Action.NAME, "Open Machine");
+		JMenuItem openmachine = new JMenuItem(openmach);
+		jm.add(openmachine);
+
+		ps.println("Module "+vm.mainModule.getText()+" {");
+		Iterator i = vm.links.iterator();
+		while (i.hasNext()) {
+			VisualLink l = (VisualLink)i.next();
+			VisualEndpoint frompt = l.from;
+			VisualEndpoint topt = l.to;
+			ps.println("\tLink from "+frompt.module.getText()+"."+frompt.label+" to "+topt.module.getText()+"."+topt.label+";");
+		}
+		ps.println("}");
+	}
+	static public void printMachines() {
+		Iterator m = machines.iterator();
+		while (m.hasNext()) {
+			VisualMachine vm = (VisualMachine)m.next();
+			vm.printLinks();
+		}
+	}
+	public void addLink(VisualLink l) {
+		links.addElement(l);
+		VisualModule from = l.from.module;
+		if (from != null) {
+			l.from.setLocation(from.getX()+from.getWidth(), (from.getY()+from.getHeight())/2);
+		}
+		l.from.setSize(40,10);
+		add(l.from);
+
+		VisualModule to = l.to.module;
+		if (to != null) {
+			l.to.setLocation(to.getX()-l.to.getWidth(), (to.getY()+to.getHeight())/2);
+		}
+		l.to.setSize(40,10);
+		add(l.to);
+	}
+	public void addLinkedModule(VisualModule mod) {
+		modules.add(mod);
+	}
+	public void remove(VisualModule mod) {
+		super.remove(mod);
+		modules.remove(mod);
+		Iterator i = links.iterator();
+		while (i.hasNext()) {
+			VisualLink l = (VisualLink)i.next();
+			VisualEndpoint frompt = l.from;
+			VisualEndpoint topt = l.to;
+			if (frompt.module == mod || topt.module == mod) {
+				frompt.getParent().remove(frompt);
+				topt.getParent().remove(topt);
+				i.remove();
+			}
+		}
+		invalidate();
+		validate();
+		repaint();
+	}
+	public VisualMachine(VisualModule mod, Placer p, Selecter s) {
+		mainModule = mod;
+		mainModule.setMachine(this);
+		machines.add(this);
+		frame = new JFrame(mainModule.getText());
+		frame.setSize(800,600);
+		Container c = frame.getContentPane();
+		setLayout(null);
+		Dimension d = new Dimension(2000,2000);
+		setMinimumSize(d);
+		setPreferredSize(d);
+		JScrollPane jsp = new JScrollPane(this);
+		c.add(jsp, BorderLayout.CENTER);
+		selecter = s;
+		addMouseListener(p);
+		addMouseMotionListener(this);
+	}
+	public JFrame getFrame() {
+		return frame;
+	}
+	public void paint(Graphics g) {
+		super.paint(g);
+		setLinks();
+		setLabels();
+		setLinks();
+		paintLinks(g);
+	}
+	public boolean contains(HashSet lines, Integer i) {
+		Iterator it = lines.iterator();
+		while (it.hasNext()) {
+			Integer in = (Integer)it.next();
+			if (in.equals(i)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	public int avoid(HashSet lines, int initial) {
+		int offset = 5; // offset between lines
+		int y = initial;
+		Integer i = new Integer(y);
+		int mult = 0;
+		int loop = 0;
+		do {
+			y = initial + offset * mult;
+			i = new Integer(y);
+			if (loop % 2 == 0) {
+				mult++;
+			} else {
+				offset = -offset;
+			}
+			loop++;
+		} while (lines != null && contains(lines, i));
+		if (lines != null) {
+			lines.add(i);
+		}
+		return y;
+	}
+
+	public void setLinkLabels(VisualModule from, VisualEndpoint frompt, VisualModule to, VisualEndpoint topt) {
+		HashSet fromleftLines = null;
+		HashSet fromrightLines = null;
+		HashSet fromtopLines = null;
+		HashSet frombottomLines = null;
+		HashSet toleftLines = null;
+		HashSet torightLines = null;
+		HashSet totopLines = null;
+		HashSet tobottomLines = null;
+		Rectangular f;
+		if (from != null) {
+			fromleftLines = from.leftLines;
+			fromrightLines = from.rightLines;
+			fromtopLines = from.topLines;
+			frombottomLines = from.bottomLines;
+			f = from;
+		} else {
+			f = frompt;
+		}
+		Rectangular t;
+		if (to != null) {
+			toleftLines = to.leftLines;
+			torightLines = to.rightLines;
+			totopLines = to.topLines;
+			tobottomLines = to.bottomLines;
+			t = to;
+		} else {
+			t = topt;
+		}
+		if ((int)f.getX() + (int)f.getWidth() < (int)t.getX()) {
+			int yl1 = avoid(fromrightLines, (int)f.getY()+(int)f.getHeight()/2);
+			int yl2 = avoid(toleftLines, (int)t.getY()+(int)t.getHeight()/2);
+			frompt.setLocation( (int)f.getX()+(int)f.getWidth(), yl1 - frompt.getHeight()/2);
+			topt.setLocation( (int)t.getX() - (int)topt.getWidth(), yl2 - topt.getHeight()/2);
+		} else if ((int)f.getX() > (int)t.getX() + (int)t.getWidth()) {
+			int yl1 = avoid(fromleftLines, (int)f.getY()+(int)f.getHeight()/2);
+			int yl2 = avoid(torightLines, ((int)t.getY()+(int)t.getHeight()/2));
+			frompt.setLocation( (int)f.getX() - frompt.getWidth(), yl1 - frompt.getHeight()/2);
+			topt.setLocation( (int)t.getX()+(int)t.getWidth(), yl2 - topt.getHeight()/2);
+		} else if ((int)f.getY() + (int)f.getHeight() < (int)t.getY()) {
+			int xl1 = avoid(frombottomLines, (int)f.getX()+(int)f.getWidth()/2);
+			int xl2 = avoid(totopLines, (int)t.getX()+(int)t.getWidth()/2);
+			frompt.setLocation( (int)xl1 - frompt.getWidth()/2, (int)f.getY()+(int)f.getHeight());
+			topt.setLocation( (int)xl2 - topt.getWidth()/2, (int)t.getY()-topt.getHeight());
+		} else if ((int)f.getY() > (int)t.getY() + (int)t.getHeight()) {
+			int xl1 = avoid(fromtopLines, (int)f.getX()+(int)f.getWidth()/2);
+			int xl2 = avoid(tobottomLines, (int)t.getX()+(int)t.getWidth()/2);
+			frompt.setLocation( (int)xl1 - frompt.getWidth()/2, (int)f.getY()-frompt.getHeight());
+			topt.setLocation( (int)xl2 - topt.getWidth()/2, (int)t.getY()+(int)t.getHeight());
+		}
+	}
+	public void setLabels() {
+		Iterator i = links.iterator();
+		while (i.hasNext()) {
+			VisualLink l = (VisualLink)i.next();
+			VisualEndpoint frompt = l.from;
+			VisualEndpoint topt = l.to;
+			VisualModule from = frompt.module;
+			VisualModule to = topt.module;
+			setLinkLabels(from, frompt, to, topt);
+		}
+	}
+	public void paintLink(Graphics g, Rectangle from, Rectangle to,
+			HashSet fromleftLines,
+			HashSet fromrightLines,
+			HashSet fromtopLines,
+			HashSet frombottomLines,
+			HashSet toleftLines,
+			HashSet torightLines,
+			HashSet totopLines,
+			HashSet tobottomLines,
+			HashSet hlines,
+			HashSet vlines, String fromLabel, String toLabel) {
+		hlines.addAll(fromleftLines);
+		hlines.addAll(fromrightLines);
+		vlines.addAll(fromtopLines);
+		vlines.addAll(frombottomLines);
+		hlines.addAll(torightLines);
+		hlines.addAll(torightLines);
+		vlines.addAll(totopLines);
+		vlines.addAll(tobottomLines);
+		FontMetrics fm = getFontMetrics(getFont());
+
+		if ((int)from.getX() + (int)from.getWidth() < (int)to.getX()) {
+			int yl1 = avoid(fromrightLines, (int)from.getY()+(int)from.getHeight()/2);
+			int xl1 = avoid(vlines, ((int)from.getX()+(int)from.getWidth()+(int)to.getX())/2);
+			int yl2 = avoid(toleftLines, (int)to.getY()+(int)to.getHeight()/2);
+			g.drawLine(
+				(int)from.getX()+(int)from.getWidth(),
+				yl1,
+				xl1,
+				yl1
+				);
+			g.drawLine(
+				xl1,
+				yl1,
+				xl1,
+				yl2
+				);
+			g.drawLine(
+				xl1,
+				yl2,
+				(int)to.getX(),
+				yl2
+				);
+		} else if ((int)from.getX() > (int)to.getX() + (int)to.getWidth()) {
+			int yl1 = avoid(fromleftLines, (int)from.getY()+(int)from.getHeight()/2);
+			int xl1 = avoid(vlines, ((int)from.getX()+(int)to.getX()+(int)to.getWidth())/2);
+			int yl2 = avoid(torightLines, ((int)to.getY()+(int)to.getHeight()/2));
+			g.drawLine(
+				(int)from.getX(),
+				yl1,
+				xl1,
+				yl1
+				);
+			g.drawLine(
+				xl1,
+				yl1,
+				xl1,
+				yl2
+				);
+			g.drawLine(
+				xl1,
+				yl2,
+				(int)to.getX()+(int)to.getWidth(),
+				yl2
+				);
+		} else if ((int)from.getY() + (int)from.getHeight() < (int)to.getY()) {
+			int xl1 = avoid(frombottomLines, (int)from.getX()+(int)from.getWidth()/2);
+			int yl1 = avoid(hlines, ((int)from.getY()+(int)from.getHeight()+(int)to.getY())/2);
+			int xl2 = avoid(totopLines, (int)to.getX()+(int)to.getWidth()/2);
+			g.drawLine(
+				xl1,
+				(int)from.getY()+(int)from.getHeight(),
+				xl1,
+				yl1
+				);
+			g.drawLine(
+				xl1,
+				yl1,
+				xl2,
+				yl1
+				);
+			g.drawLine(
+				xl2,
+				yl1,
+				xl2,
+				(int)to.getY()
+				);
+		} else if ((int)from.getY() > (int)to.getY() + (int)to.getHeight()) {
+			int xl1 = avoid(fromtopLines, (int)from.getX()+(int)from.getWidth()/2);
+			int yl1 = avoid(hlines, ((int)to.getY()+(int)to.getHeight()+(int)from.getY())/2);
+			int xl2 = avoid(tobottomLines, (int)to.getX()+(int)to.getWidth()/2);
+			g.drawLine(
+				xl1,
+				(int)from.getY(),
+				xl1,
+				yl1
+				);
+			g.drawLine(
+				xl1,
+				yl1,
+				xl2,
+				yl1
+				);
+			g.drawLine(
+				xl2,
+				yl1,
+				xl2,
+				(int)to.getY()+(int)to.getHeight()
+				);
+		}
+	}
+	public void paintLinks(Graphics g) {
+		HashSet vlines = new HashSet();
+		HashSet hlines = new HashSet();
+		FontMetrics fm = getFontMetrics(getFont());
+		Iterator i = links.iterator();
+		while (i.hasNext()) {
+			VisualLink l = (VisualLink)i.next();
+			Rectangular from = l.from.module;
+			if (from == null) {
+				from = l.from;
+			}
+			Rectangular to = l.to.module;
+			if (to == null) {
+				to = l.to;
+			}
+			paintLink(g, from.getBounds(), to.getBounds(),
+				from.leftLines(),
+				from.rightLines(),
+				from.topLines(),
+				from.bottomLines(),
+				to.leftLines(),
+				to.rightLines(),
+				to.topLines(),
+				to.bottomLines(),
+				hlines,
+				vlines,
+				l.from.label, l.to.label);
+		}
+		VisualModule current = selecter.getCurrent();
+		if (current != null && selecter.isLinking()) {
+			Rectangle r = new Rectangle(mx, my, 1, 1);
+			paintLink(g, current.getBounds(), r,
+				hlines,
+				hlines,
+				vlines,
+				vlines,
+				hlines,
+				hlines,
+				vlines,
+				vlines,
+				hlines,
+				vlines,
+				"from", "to");
+		}
+	}
+	public void mouseDragged(MouseEvent e) {
+		mx = e.getX();
+		my = e.getY();
+		repaint();
+	}
+	public void mouseMoved(MouseEvent e) {
+		mx = e.getX();
+		my = e.getY();
+		repaint();
+	}
+	public void setLinks() {
+		Iterator mi = modules.iterator();
+		while (mi.hasNext()) {
+			VisualModule mod = (VisualModule)mi.next();
+			mod.rightLines = new HashSet();
+			mod.leftLines = new HashSet();
+			mod.topLines = new HashSet();
+			mod.bottomLines = new HashSet();
+		}
+	}
+	static public void link(VisualModule frommod, VisualModule tomod, AcquireLabel fromal, AcquireLabel toal) {
+		VisualMachine fromvm = (VisualMachine)frommod.getParent();
+		VisualMachine tovm = (VisualMachine)tomod.getParent();
+		if (fromvm == tovm) {
+			VisualEndpoint from;
+			VisualEndpoint to;
+			try {
+				from = fromal.acquire(frommod);
+				to = toal.acquire(tomod);
+			} catch (Exception e) {
+				return;  // problem naming object
+			}
+
+			from.module = frommod;
+			to.module = tomod;
+			VisualLink l = new VisualLink();
+			from.setLink(l);
+			l.from = from;
+			to.setLink(l);
+			l.to = to;
+			fromvm.addLink(l);
+
+			fromvm.addLinkedModule(frommod);
+			frommod.invalidate();
+			frommod.validate();
+			fromvm.invalidate();
+			fromvm.validate();
+			frommod.repaint();
+			fromvm.repaint();
+
+			tovm.addLinkedModule(tomod);
+			tomod.invalidate();
+			tomod.validate();
+			tovm.invalidate();
+			tovm.validate();
+			tomod.repaint();
+			tovm.repaint();
+		}
+	}
+}

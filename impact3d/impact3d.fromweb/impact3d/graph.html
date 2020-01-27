@@ -1,0 +1,102 @@
+<!DOCTYPE html > 
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+	<head> 
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8" /> 
+		<title>Simple WebGL example</title> 
+		<style> 
+		p.case { clear: both; border-top: 1px solid #888; }
+		</style> 
+        <link rel="stylesheet" type="text/css" href="x3dom.css" /> 
+	</head> 
+       
+<body> 
+ 
+		<x3d id="boxes" showStat="true" x="0px" y="0px" width="400px" height="300px"> 
+			<scene> 
+				<viewpoint position='4.88104 4.59865 7.4181' orientation='-0.69017 0.723467 -0.0161809 0.735134' ></viewpoint> 
+				<background DEF='bgnd' transparency='0' skyColor='1 1 1' ></background> 
+				<transform id="root" translation="0 0 0"> 
+				</transform> 
+			</scene> 
+		</x3d> 
+	
+	<script type="text/javascript"> 
+
+
+   var nodes = [];
+   var pts = '';
+   var i = 0;
+
+
+    function addArc(index) {
+	pts = pts +" "+ nodes[index].getAttribute('translation') +" ";
+	alert (pts);
+        var t = document.createElement('Transform');
+        var s = document.createElement('Shape');
+        t.appendChild(s);
+        var a = document.createElement('Appearance');
+	s.appendChild(a);
+        var m = document.createElement('Material');
+	m.setAttribute('ambientIntensity', '0.0243902' );
+	m.setAttribute('diffuseColor', '0.41 0.39 0.03' );
+	m.setAttribute('shininess', '0.12' );
+	m.setAttribute('specularColor', '0.94 0.72 0' );
+	a.appendChild(m);
+	s.appendChild(a);
+        var p = document.createElement('PointSet');
+        s.appendChild(p);
+        var coord = document.createElement('Coordinate');
+	coord.setAttribute('point', pts);
+        p.appendChild(coord);
+        var ot = document.getElementById('root');
+        ot.appendChild(t);
+    }
+	    
+    function addNode()
+    {
+		x = Math.random() * 6 - 3;
+		y = Math.random() * 6 - 3;
+		z = Math.random() * 6 - 3;
+	
+        var t = document.createElement('Transform');
+        t.setAttribute("translation", x + " " + y + " " + z );
+	nodes[i] = t;
+        t.setAttribute("scale", 0.1 + " " + 0.1 + " " + 0.1 );
+        var s = document.createElement('Shape');
+        t.appendChild(s);
+        var b = document.createElement('Box');
+	b.setAttribute('onclick', 'addArc('+i+')');
+	i++;
+        s.appendChild(b);
+        
+        var ot = document.getElementById('root');
+        ot.appendChild(t);
+        
+        return false;
+    };
+    
+    function removeNode()
+    {
+        var ot = document.getElementById('root');
+        for (var i = 0; i < ot.childNodes.length; i++) {
+        	// check if we have a real X3DOM Node; not just e.g. a Text-tag
+        	if (ot.childNodes[i].nodeType === Node.ELEMENT_NODE) {
+        		ot.removeChild(ot.childNodes[i]);
+  				break;
+  			}
+  		}
+        
+        return false;
+    };
+    
+	</script> 
+	
+	<p class="case"> &nbsp; 
+	<input type="button" value="Add Node" 		onclick="window.addNode();" /> 
+	<input type="button" value="Remove Node" 	onclick="window.removeNode();" /> 
+	</p> 
+	
+	<script type="text/javascript" src="x3dom.js"></script> 
+ 
+</body> 
+</html>

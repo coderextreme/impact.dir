@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE X3D PUBLIC "ISO//Web3D//DTD X3D 3.0//EN"
+                     "http://www.web3d.org/specifications/x3d-3.0.dtd">
+<X3D profile="Immersive" version="3.0"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance" xsd:noNamespaceSchemaLocation="http://www.web3d.org/specifications/x3d-3.0.xsd">
+    <head>
+        <meta name="author" content="John Carlson"/>
+    </head>
+    <Scene>
+	<Group>
+        <StringSensor DEF="Keystrokes" enabled="true"/>
+        <ProtoDeclare name="GraphNode">
+            <ProtoInterface>
+                <field name="translation" type="SFVec3f" accessType="inputOutput" value="0 0 0"/>
+            </ProtoInterface>
+            <ProtoBody>
+                <Transform scale="0.2 0.2 0.2">
+                    <IS>
+                        <connect nodeField='translation'
+			protoField='translation'/>
+                    </IS>
+                    <Shape>
+                        <Appearance>
+                            <Material diffuseColor="1 0 0"/>
+                        </Appearance>
+                        <Sphere/>
+                    </Shape>
+                </Transform>
+            </ProtoBody>
+        </ProtoDeclare>
+        <NavigationInfo type="&quot;EXAMINE&quot; &quot;ANY&quot;"/>
+        <Viewpoint description="Nodes" orientation="1 0 0 -0.4" position="0 5 12"/>
+        <ProtoInstance name="GraphNode" DEF="Node1">
+            <fieldValue name="translation" value="0 2 0"/>
+        </ProtoInstance>
+        <ProtoInstance name="GraphNode" DEF="Node2">
+            <fieldValue name="translation" value="0 -2 0"/>
+        </ProtoInstance>
+        <ProtoInstance name="GraphNode" DEF="Node3">
+            <fieldValue name="translation" value="0 0 0"/>
+        </ProtoInstance>
+ <Script DEF="AddNode">
+  <field accessType="inputOnly" name="add_new_node" type="SFString"/>
+<![CDATA[
+ecmascript:
+
+function add_new_node() {
+	location = (Math.random()*4-2)+" "+(Math.random()*4-2)+" "+(Math.random()*4-2);
+        instance =  Browser.createX3DFromString("<ProtoInstance name='GraphNode' DEF='Node3'><fieldValue name='translation' value='"+location+"'/></ProtoInstance>");
+	scene = Browser.currentScene;
+        scene.addRootNode(instance);
+}
+]]>
+                </Script>
+        <ROUTE fromField="enteredText" fromNode="Keystrokes"
+          toField="add_new_node" toNode="AddNode"/>
+	</Group>
+    </Scene>
+</X3D>

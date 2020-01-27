@@ -1,0 +1,15 @@
+Module Nand
+Input B1, B2 <boolean>
+Output NandOut <boolean>
+
+Module True
+Input
+Output TrueVal <boolean>
+
+Module Consume
+Input  InVal <anything>
+Output
+
+Module Replicate
+Input InVal
+Output OutVal0, OutVal1 

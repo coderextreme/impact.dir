@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- JNLP File for Impact Simulator -->
+<jnlp
+  spec="1.0+"
+  codebase="http://schizophrenics.net/yottzumm/impact"
+  href="impactstr.jnlp">
+  <information>
+    <title>Impact Simulator</title>
+    <vendor>DSC</vendor>
+    <description>Impact Simulator</description>
+  </information>
+  <resources>
+    <j2se version="1.5+" href="http://java.sun.com/products/autodl/j2se"/>
+    <jar href="impactstr.jar"/>
+  </resources>
+  <application-desc main-class="impact.Cell">
+      <argument>sortmachine</argument>
+  </application-desc>
+</jnlp>

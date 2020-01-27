@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"><head> 
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
+		<title>Simple WebGL example</title> 
+		<style> 
+		p.case { clear: both; border-top: 1px solid #888; }
+		</style> 
+        <link rel="stylesheet" type="text/css" href="graph2_files/x3dom.css"> 
+	</head> 
+       
+<body> 
+ 
+		<x3d id="boxes" showstat="true" x="0px" y="0px" width="400px" height="300px"> 
+			<scene> 
+				<viewpoint position="4.88104 4.59865 7.4181" orientation="-0.69017 0.723467 -0.0161809 0.735134"></viewpoint> 
+				<background def="bgnd" transparency="0" skycolor="1 1 1"></background> 
+				<transform id="root" translation="0 0 0"> 
+				<transform scale="0.1 0.1 0.1" translation="0.09238097038534976 2.467086835296506 -1.521930875592369"><shape><box onclick="addArc(0)"></box></shape></transform><transform scale="0.1 0.1 0.1" translation="1.21072858812252 0.7889300052840618 -1.284230559168381"><shape><box onclick="addArc(1)"></box></shape></transform><transform scale="0.1 0.1 0.1" translation="-0.30564386131350885 1.6898122065682175 1.8522617731860942"><shape><box onclick="addArc(2)"></box></shape></transform><transform scale="0.1 0.1 0.1" translation="-1.1916647786345238 -2.990106618445516 -1.5116564600929576"><shape><box onclick="addArc(3)"></box></shape></transform><transform scale="0.1 0.1 0.1" translation="-1.3228707106962085 -1.8416785174736785 1.759277586977868"><shape><box onclick="addArc(4)"></box></shape></transform><transform scale="0.1 0.1 0.1" translation="2.4013164445997512 -2.6073060456399597 -0.570914338108345"><shape><box onclick="addArc(5)"></box></shape></transform></transform> 
+			</scene> 
+		<canvas tabindex="0" height="300px" width="400px" style="width: 400px; height: 300px;" id="x3dom-boxes-canvas" class="x3dom-canvas"></canvas><div style="display: inline;" class="x3dom-statdiv">17.54 fps<br>anim: 0<br>traverse: 0<br>sort: 1<br>render: 4<br>#Tris: 72<br>#Pnts: 144</div></x3d> 
+	
+	<script type="text/javascript"> 
+
+
+   var nodes = [];
+   var pts = '';
+   var i = 0;
+
+
+    function addArc(index) {
+	pts = pts +" "+ nodes[index].getAttribute('translation') +" ";
+	alert (pts);
+        var t = document.createElement('Transform');
+        var s = document.createElement('Shape');
+        t.appendChild(s);
+        var p = document.createElement('Polygon');
+        s.appendChild(p);
+        var coord = document.createElement('Coordinate');
+	coord.setAttribute('point', p);
+        var coord = document.createElement('Color');
+        p.appendChild(coord);
+    }
+	    
+    function addNode()
+    {
+		x = Math.random() * 6 - 3;
+		y = Math.random() * 6 - 3;
+		z = Math.random() * 6 - 3;
+	
+        var t = document.createElement('Transform');
+        t.setAttribute("translation", x + " " + y + " " + z );
+	nodes[i] = t;
+        t.setAttribute("scale", 0.1 + " " + 0.1 + " " + 0.1 );
+        var s = document.createElement('Shape');
+        t.appendChild(s);
+        var b = document.createElement('Box');
+	b.setAttribute('onclick', 'addArc('+i+')');
+	i++;
+        s.appendChild(b);
+        
+        var ot = document.getElementById('root');
+        ot.appendChild(t);
+        
+        return false;
+    };
+    
+    function removeNode()
+    {
+        var ot = document.getElementById('root');
+        for (var i = 0; i < ot.childNodes.length; i++) {
+        	// check if we have a real X3DOM Node; not just e.g. a Text-tag
+        	if (ot.childNodes[i].nodeType === Node.ELEMENT_NODE) {
+        		ot.removeChild(ot.childNodes[i]);
+  				break;
+  			}
+  		}
+        
+        return false;
+    };
+    
+	</script> 
+	
+	<p class="case"> &nbsp; 
+	<input value="Add Node" onclick="window.addNode();" type="button"> 
+	<input value="Remove Node" onclick="window.removeNode();" type="button"> 
+	</p> 
+	
+	<script type="text/javascript" src="graph2_files/x3dom.js"></script> 
+ 
+ 
+
+<div style="clear: both; display: none;">
+</div><div style="border: 2px solid olivedrab; height: 180px; padding: 4px; overflow: auto; white-space: pre-wrap; font-family: sans-serif; font-size: x-small; color: rgb(0, 255, 0); background-color: black; clear: both; margin-right: 10px; display: none;" id="x3dom_logdiv"><p style="margin: 0pt; color: rgb(255, 69, 0);">ERROR: WARNING: vertex shader writes varying 'fragEyePosition' which is not active.
+</p><p style="margin: 0pt; color: rgb(0, 255, 0);">INFO: activate Bindable null</p><p style="margin: 0pt; color: rgb(0, 255, 0);">INFO: register bindable Fog</p><p style="margin: 0pt; color: rgb(0, 255, 0);">INFO: create new Fog for X3DFogNode-stack</p><p style="margin: 0pt; color: rgb(0, 255, 0);">INFO: Time for setup and init of GL element no. 0: 159 ms.</p><p style="margin: 0pt; color: rgb(0, 255, 0);">INFO: activate Bindable null</p><p style="margin: 0pt; color: rgb(0, 255, 0);">INFO: activate first Viewpoint for X3DViewpointNode-stack</p><p style="margin: 0pt; color: rgb(0, 255, 0);">INFO: activate Bindable bgnd</p><p style="margin: 0pt; color: rgb(0, 255, 0);">INFO: activate first Background for X3DBackgroundNode-stack</p><p style="margin: 0pt; color: rgb(0, 255, 0);">INFO: FBO-Status: 36053</p><p style="margin: 0pt; color: rgb(0, 255, 0);">INFO: FBO-Status: 36053</p><p style="margin: 0pt; color: rgb(0, 255, 0);">INFO: activate Bindable null</p><p style="margin: 0pt; color: rgb(0, 255, 0);">INFO: NavType: examine</p><p style="margin: 0pt; color: rgb(0, 255, 0);">INFO: register bindable NavigationInfo</p><p style="margin: 0pt; color: rgb(0, 255, 0);">INFO: create new NavigationInfo for X3DNavigationInfoNode-stack</p><p style="margin: 0pt; color: rgb(0, 255, 0);">INFO: loaded '[object HTMLUnknownElement]'</p><p style="margin: 0pt; color: rgb(0, 255, 0);">INFO: register bindable Background</p><p style="margin: 0pt; color: rgb(0, 255, 0);">INFO: register bindable Viewpoint</p><p style="margin: 0pt; color: rgb(0, 255, 0);">INFO: addEventListener for X3D.onDOMNodeInserted</p><p style="margin: 0pt; color: rgb(0, 255, 0);">INFO: addEventListener for X3D.onDOMNodeRemoved</p><p style="margin: 0pt; color: rgb(0, 255, 0);">INFO: 
+Vendor: Mozilla, Renderer: Mozilla, Version: WebGL 1.0, ShadingLangV.: WebGL GLSL ES 1.0</p><p style="margin: 0pt; color: rgb(0, 255, 0);">INFO: Initializing X3DCanvas for [x3dom-boxes-canvas]</p><p style="margin: 0pt; color: rgb(0, 255, 0);">INFO: Creating canvas for (X)3D element...</p><p style="margin: 0pt; color: rgb(0, 255, 0);">INFO: Found 1 X3D and 0 (experimental) WebSG nodes...</p><p style="margin: 0pt; color: rgb(0, 255, 0);">INFO: X3Dom version 1.2-alpha Rev. 956</p></div></body></html>

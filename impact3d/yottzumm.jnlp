@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- JNLP File for Impact 3D Simulator -->
+<jnlp
+  spec="1.0+"
+  codebase="http://coderextreme.net/impact3d/"
+  href="yottzumm.jnlp">
+  <information>
+    <title>Impact 3D Simulator</title>
+    <vendor>DSC</vendor>
+    <description>Impact 3D Simulator</description>
+  </information>
+  <update check="background" policy="always"/>
+  <resources>
+    <j2se version="1.5+" href="http://java.sun.com/products/autodl/j2se"/>
+    <property name="sun.java2d.noddraw" value="true"/>
+    <jar href="impact3d.jar"/>
+    <extension name="jogl-all-awt" href="http://jogamp.org/deployment/jogamp-current/jogl-all-awt.jnlp" />
+  </resources>
+  <application-desc main-class="impact.Impact3D">
+	<argument>yottzumm</argument>
+	<argument>http://coderextreme.net/helloworld.php?nick=yottzumm</argument>
+	<argument>http://coderextreme.net/helloworld.php?nick=yottzumm</argument>
+  </application-desc/>
+
+  <resources>
+  </resources>
+
+</jnlp>

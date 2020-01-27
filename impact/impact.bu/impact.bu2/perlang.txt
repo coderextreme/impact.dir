@@ -1,0 +1,79 @@
+# perlang, a personality design language
+
+# F is full, either 0 or 1
+# E is empty
+# NA or "  " is not applicable to this part of the personality
+# LI is left input
+# LO is left output
+# RI is right input
+# RO is right output
+# TI is top input
+# TO is top output
+# BI is bottom input
+# BO is bottom output
+
+# horizontal is inputs and outputs
+# vertical is sub personalities
+
+Personality: PASS
+
+       LI LO RI RO TI TO BI BO
+       -----------------------
+Before F        E             
+After  E        LI            
+
+Before    E  F                
+After     RI E                
+
+Before             F        E 
+After              E        TI
+
+Before                E  F    
+After                 BI E    
+
+Personality: AND
+
+       LI LO RI RO TI TO    BI BO
+       --------------------------
+Before    E  F     F  E        E 
+After     RI E     E  LI&TI    TI    
+
+Personality: SORT TOP (bugs in here)
+
+       LI LO                                                   RI RO TI TO BI BO
+       -------------------------------------------------------------------------
+Before    E                                                    F           F  E 
+After     if(!flip&&RI==0&&BI==1)flip=true;if(flip)BI else RI; E           E  RI
+
+Personality: MULT ADDER (in 4 bit by 4 bit multiply)
+
+       LI LO RI RO TI TO BI BO
+       -----------------------
+Before             F        E
+After              E        TI
+
+Before 0  E  0  E        0
+After  E  0  E  0        E
+
+Before 0  E  0  E        1
+After  E  0  E  1        E
+
+Before 0  E  1  E        0
+After  E  0  E  1        E
+
+Before 1  E  0  E        0
+After  E  0  E  1        E
+
+
+Before 0  E  1  E        1
+After  E  1  E  0        E
+
+Before 1  E  0  E        1
+After  E  1  E  0        E
+
+Before 1  E  1  E        0
+After  E  1  E  0        E
+
+
+Before 1  E  1  E        1
+After  E  1  E  1        E

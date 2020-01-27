@@ -1,0 +1,254 @@
+public class Impact extends JFrame implements WindowListener {
+	Placer p;
+	Selecter s;
+	CreateModule cm;
+	ExpandModule em;
+	Cut ct;
+	Copy cpy;
+	Paste paste;
+	public void init() {
+		getContentPane().setLayout(new BorderLayout());
+		CreateLink cl = new CreateLink();
+		p = new Placer();
+		s = new Selecter(cl);
+		cm = new CreateModule(s, p);
+		em = new ExpandModule(s, p);
+		ct = new Cut(s, p);
+		cpy = new Copy(s, p);
+		paste = new Paste(s, p, cm);
+
+		JMenuBar jmb = new JMenuBar();
+		JMenu jm = new JMenu("File");
+		jmb.add(jm);
+
+		AbstractAction newmach = new AbstractAction() {
+			public void actionPerformed(ActionEvent ae) {
+				System.err.println(getValue(NAME));
+				VisualModule mod = new VisualModule("Main");
+				VisualMachine vm = new VisualMachine(mod, p, s);
+				vm.getFrame().setVisible(true);
+			}
+		};
+		newmach.putValue(Action.NAME, "New Machine");
+		JMenuItem newmachine = new JMenuItem(newmach);
+		jm.add(newmachine);
+
+		AbstractAction openmach = new AbstractAction() {
+			public void actionPerformed(ActionEvent ae) {
+				System.err.println(getValue(NAME));
+				VisualModule mod = new VisualModule("Main");
+				VisualMachine vm = new VisualMachine(mod, p, s);
+				Cell.addCells();
+				InputStream is;
+				try {
+					FileOpenService fos = (FileOpenService)ServiceManager.lookup("javax.jnlp.FileOpenService");
+					FileContents fc = fos.openFileDialog(null, null);
+					is = fc.getInputStream();
+				} catch (Exception e) {
+					try {
+						JFileChooser jfc = new JFileChooser(System.getProperty("user.dir"));
+						int rv = jfc.showOpenDialog(vm);
+						if (rv != JFileChooser.APPROVE_OPTION) {
+							return;
+						}
+						is = new FileInputStream(jfc.getSelectedFile()); 
+					} catch (Exception e2) {
+						e2.printStackTrace();
+						return;
+					}
+				}
+				try {
+					ObjectInputStream ois = new ObjectInputStream(is);
+					Cell.openMachine(ois);
+					ois.close();
+					is.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+					return;
+				}
+				int id = 0;
+				VisualModule [][] modulearray = new VisualModule[Common.PMAXX][Common.PMAXY];
+				for (int y = 0; y < Common.PMAXY; y++) {
+					for (int x = 0; x < Common.PMAXX; x++) {
+						MouseEvent me = new MouseEvent(
+							vm,
+							id++,
+							System.currentTimeMillis(),
+							0, x*150, y*50,
+							1, false);
+									
+						String name = Common.cells[x][y].getPersonality().getClass().getName();
+						modulearray[x][y] = cm.addModule(vm, name, me);
+					}
+				}
+				for (int y = 0; y < Common.PMAXY; y++) {
+					for (int x = 0; x < Common.PMAXX; x++) {
+						if (y < Common.PMAXY-1 && x > 0 && x < Common.PMAXX-1 ) {
+							VisualMachine.link(modulearray[x][y],
+									modulearray[x][y+1],
+									new AcquireLabel("bottom", false),
+									new AcquireLabel("top", false));
+							VisualMachine.link(modulearray[x][y+1],
+									modulearray[x][y],
+									new AcquireLabel("top", false),
+									new AcquireLabel("bottom", false));
+						}
+						if (x < Common.PMAXX-1 && y > 0 && y < Common.PMAXY-1 ) {
+							VisualMachine.link(modulearray[x][y],
+									modulearray[x+1][y],
+									new AcquireLabel("right", false),
+									new AcquireLabel("left", false));
+							VisualMachine.link(modulearray[x+1][y],
+									modulearray[x][y],
+									new AcquireLabel("left", false),
+									new AcquireLabel("right", false));
+						}
+					}
+				}
+				vm.getFrame().setVisible(true);
+			}
+		};
+		openmach.putValue(Action.NAME, "Open Machine");
+		JMenuItem openmachine = new JMenuItem(openmach);
+		jm.add(openmachine);
+
+		AbstractAction saveact = new AbstractAction() {
+			public void actionPerformed(ActionEvent ae) {
+				System.err.println(getValue(NAME));
+				VisualMachines.printMachines();
+			}
+		};
+		saveact.putValue(Action.NAME, "Save");
+		JMenuItem save = new JMenuItem(quitact);
+		jm.add(save);
+
+		AbstractAction quitact = new AbstractAction() {
+			public void actionPerformed(ActionEvent ae) {
+				System.err.println(getValue(NAME));
+				System.exit(0);
+			}
+		};
+		quitact.putValue(Action.NAME, "Quit");
+		JMenuItem quit = new JMenuItem(quitact);
+		jm.add(quit);
+
+		setJMenuBar(jmb);
+
+
+
+
+
+
+
+
+
+		JToolBar jtb = new JToolBar();
+		getContentPane().add(jtb, BorderLayout.PAGE_START);
+
+		ButtonGroup bg = new ButtonGroup();
+
+		AbstractAction select = new AbstractAction() {
+			public void actionPerformed(ActionEvent ae) {
+				System.err.println(getValue(NAME));
+				s.setLinking(false);
+				cm.setCreating(false);
+				p.setCommand(null);
+			}
+		};
+		select.putValue(Action.NAME, "Select");
+		JButton selectbut = jtb.add(select);
+		bg.add(selectbut);
+
+		AbstractAction newmod = new AbstractAction() {
+			public void actionPerformed(ActionEvent ae) {
+				System.err.println(getValue(NAME));
+				s.setLinking(false);
+				cm.setCreating(true);
+				p.setCommand(cm);
+			}
+		};
+		newmod.putValue(Action.NAME, "New Module");
+		JButton newmodbut = jtb.add(newmod);
+		bg.add(newmodbut);
+
+		AbstractAction newlink = new AbstractAction() {
+			public void actionPerformed(ActionEvent ae) {
+				System.err.println(getValue(NAME));
+				s.setLinking(true);
+				cm.setCreating(false);
+			}
+		};
+		newlink.putValue(Action.NAME, "New Link");
+		JButton newlinkbut = jtb.add(newlink);
+		bg.add(newlinkbut);
+
+		AbstractAction expand = new AbstractAction() {
+			public void actionPerformed(ActionEvent ae) {
+				System.err.println(getValue(NAME));
+				s.setLinking(false);
+				cm.setCreating(false);
+				p.setCommand(em);
+			}
+		};
+
+		expand.putValue(Action.NAME, "Expand Module");
+		JButton expandbut = jtb.add(expand);
+		bg.add(expandbut);
+
+		AbstractAction cut = new AbstractAction() {
+			public void actionPerformed(ActionEvent ae) {
+				System.err.println(getValue(NAME));
+				s.setLinking(false);
+				cm.setCreating(false);
+				p.setCommand(ct);
+			}
+		};
+		cut.putValue(Action.NAME, "Cut");
+		JButton cutbut = jtb.add(cut);
+		bg.add(cutbut);
+
+		AbstractAction copy = new AbstractAction() {
+			public void actionPerformed(ActionEvent ae) {
+				System.err.println(getValue(NAME));
+				s.setLinking(false);
+				cm.setCreating(false);
+				p.setCommand(cpy);
+			}
+		};
+		copy.putValue(Action.NAME, "Copy");
+		JButton copybut = jtb.add(copy);
+		bg.add(copybut);
+
+		AbstractAction pasteact = new AbstractAction() {
+			public void actionPerformed(ActionEvent ae) {
+				System.err.println(getValue(NAME));
+				s.setLinking(false);
+				cm.setCreating(false);
+				p.setCommand(paste);
+			}
+		};
+		pasteact.putValue(Action.NAME, "Paste");
+		JButton pastebut = jtb.add(pasteact);
+		bg.add(pastebut);
+
+		pack();
+		setVisible(true);
+		addWindowListener(this);
+	}
+
+	public void windowActivated(WindowEvent e) {}
+	public void windowClosed(WindowEvent e) {}
+	public void windowClosing(WindowEvent e) {
+		System.exit(0);
+	}
+	public void windowDeactivated(WindowEvent e) {}
+	public void windowDeiconified(WindowEvent e) {}
+	public void windowIconified(WindowEvent e) {}
+	public void windowOpened(WindowEvent e) {}
+											      
+
+	public static void main(String args[]) {
+		Impact i = new Impact();
+		i.init();
+	}
+}
