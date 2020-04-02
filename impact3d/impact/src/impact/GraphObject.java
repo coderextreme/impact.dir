@@ -1,7 +1,9 @@
 package impact;
 
-import javax.media.opengl.*;
-import javax.media.opengl.glu.*;
+//import javax.media.opengl.*;
+//import javax.media.opengl.glu.*;
+import com.jogamp.opengl.*;
+import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.*;
 
 public abstract class GraphObject {
