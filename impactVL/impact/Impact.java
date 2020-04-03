@@ -6,7 +6,6 @@ import javax.swing.border.*;
 import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
-import javax.jnlp.*;
 
 class Module {
 	Vector endPoints; // links around outside of module
@@ -903,11 +902,12 @@ public class Impact extends JFrame implements WindowListener {
 				VisualModule mod = new VisualModule("Main");
 				VisualMachine vm = new VisualMachine(mod, p, s);
 				Cell.addCells();
-				InputStream is;
+				InputStream is = null;
 				try {
-					FileOpenService fos = (FileOpenService)ServiceManager.lookup("javax.jnlp.FileOpenService");
-					FileContents fc = fos.openFileDialog(null, null);
-					is = fc.getInputStream();
+					//FileOpenService fos = (FileOpenService)ServiceManager.lookup("javax.jnlp.FileOpenService");
+					//FileContents fc = fos.openFileDialog(null, null);
+					//is = fc.getInputStream();
+					is = new FileInputStream("machineoutput");
 				} catch (Exception e) {
 					try {
 						JFileChooser jfc = new JFileChooser(System.getProperty("user.dir"));
