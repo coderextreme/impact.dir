@@ -1,8 +1,5 @@
 IMPACT=target/impact-2.0.0-SNAPSHOT.jar
 
-impact: ${IMPACT}
-	java -classpath ${IMPACT} impact.App
-
 cell: ${IMPACT}
 	java -classpath ${IMPACT} impact.Cell
 

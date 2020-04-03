@@ -4,8 +4,8 @@ first run
 '''
 mvn install
 '''
-then run
+then run the below for division
 ''''
-make
+make cell
 '''
 then run run.sh or run.bat
