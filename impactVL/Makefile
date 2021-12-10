@@ -1,4 +1,4 @@
-export CLASSPATH="impact.jar;.;images"
+export CLASSPATH="impact.jar:.:images"
 
 impactVL: impact.jar
 	java -classpath $(CLASSPATH) impact.Impact
