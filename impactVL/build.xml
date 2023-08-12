@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- You may freely edit this file. See commented blocks below for -->
+<!-- some examples of how to customize the build. -->
+<!-- (If you delete it and reopen the project it will be recreated.) -->
+<!-- By default, only the Clean and Build commands use this build script. -->
+<!-- Commands such as Run, Debug, and Test only use this build script if -->
+<!-- the Compile on Save feature is turned off for the project. -->
+<!-- You can turn off the Compile on Save (or Deploy on Save) setting -->
+<!-- in the project's Project Properties dialog box.-->
+
+<!--
+  Copyright (c) 2000-2019 held by the author(s).  All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer
+      in the documentation and/or other materials provided with the
+      distribution.
+    * Neither the names of the Naval Postgraduate School (NPS)
+      Modeling Virtual Environments and Simulation (MOVES) Institute
+      (http://www.nps.edu and http://www.MovesInstitute.org)
+      nor the names of its contributors may be used to endorse or
+      promote products derived from this software without specific
+      prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<project name="Impact" default="default" basedir=".">
+    <description>Builds, tests, and runs the ImpactVL project.</description>
+    <property name="fork"                value="true"/>    <!-- note that Netbeans default path is built in and has to be overridden by going to     -->
+    <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+    <property name="impact.jar"     value="impact.jar"/>
+    <property name="javac.verbose"              value="true"/>
+    <property name="java.classes.dir"        value="impact"/>
+    <target name="all" depends="default,impact"/>
+
+    <target name="default">
+
+		<javac  srcdir="impact"
+			   destdir="impact"
+			 classpath=".;images"
+		 includeantruntime="false"
+			   verbose="${javac.verbose}"
+			   fork="${fork}">
+		</javac>
+
+		<jar destfile="${impact.jar}" duplicate="fail" strict="warn">
+            <!-- http://docs.oracle.com/javase/8/docs/technotes/guides/deploy/manifest.html -->
+            <manifest id="ClassesJarManifest">
+                <attribute name="Built-By" value="${user.name.build}"/>
+                <attribute name="Implementation-Vendor" value="John Carlson"/>
+                <attribute name="Implementation-Title" value="ImpactVL"/>
+                <attribute name="Implementation-Version" value="2.0"/>
+                <attribute name="Sealed" value="true"/>
+            </manifest>
+            <fileset dir=".">
+		    <include name="**/*.class"/>
+		    <include name="**/images/*.gif"/>
+		    <include name="**/sort*"/>
+                    <exclude name="*.jar"/>
+            </fileset>
+	 </jar>
+    </target>
+    <target name="impact" depends="default">
+        <java classname="impact.Impact" classpath="impact.jar;.;images" fork="${fork}">
+	</java>
+    </target>
+    <target name="Cell" depends="default">
+	<java classname="impact.Cell" classpath="impact.jar;.;images" fork="${fork}">
+	</java>
+    </target>
+    <target name="Cell4x4" depends="default">
+	<java classname="impact.Cell" classpath="impact.jar;.;images" fork="${fork}">
+		<arg value="4x4"/>
+	</java>
+    </target>
+</project>
