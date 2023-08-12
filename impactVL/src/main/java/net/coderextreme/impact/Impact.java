@@ -5,6 +5,7 @@ import javax.swing.border.*;
 import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 class Module {  // aka Node
 	Vector endPoints; // links around outside of module
@@ -912,6 +913,9 @@ public class Impact extends JFrame implements WindowListener {
 				} catch (Exception e) {
 					try {
 						JFileChooser jfc = new JFileChooser(System.getProperty("user.dir"));
+						jfc.removeChoosableFileFilter(jfc.getAcceptAllFileFilter());
+						jfc.setFileFilter(new FileNameExtensionFilter("Files ending in .rg", "rg"));
+
 						int rv = jfc.showOpenDialog(vm);
 						if (rv != JFileChooser.APPROVE_OPTION) {
 							return;

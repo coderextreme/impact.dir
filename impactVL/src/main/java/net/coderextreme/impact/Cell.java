@@ -429,7 +429,7 @@ public class Cell extends Component implements MouseMotionListener, MouseListene
 			}
 		});
 		jm.add(jmi);
-		jmi = new JMenuItem("Route Graph...");
+		jmi = new JMenuItem("Open Route Graph...");
 		jmi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				JFileChooser jfc = new JFileChooser(System.getProperty("user.dir"));
@@ -490,7 +490,7 @@ public class Cell extends Component implements MouseMotionListener, MouseListene
 			}
 		});
 		jm.add(jmi);
-		jmi = new JMenuItem("Save Machine As...");
+		jmi = new JMenuItem("Save Route Group As...");
 		jmi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				JFileChooser jfc = new JFileChooser(System.getProperty("user.dir"));

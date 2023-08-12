@@ -91,6 +91,10 @@ POSSIBILITY OF SUCH DAMAGE.
         <java classname="net.coderextreme.impact.Impact" classpath="build;impact.jar;src/main/resources/" fork="${fork}">
 	</java>
     </target>
+    <target name="impact.jar" depends="default">
+        <java classname="net.coderextreme.impact.Impact" classpath="build;impact.jar;src/main/resources/" fork="${fork}">
+	</java>
+    </target>
     <target name="Cell" depends="default">
 	<java classname="net.coderextreme.impact.Cell" classpath="build;impact.jar;src/main/resources/" fork="${fork}">
 	</java>
