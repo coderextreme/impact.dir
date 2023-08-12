@@ -68,6 +68,7 @@ POSSIBILITY OF SUCH DAMAGE.
                 <attribute name="Implementation-Vendor" value="John Carlson"/>
                 <attribute name="Implementation-Title" value="ImpactVL"/>
                 <attribute name="Implementation-Version" value="2.0"/>
+                <attribute name="Main-Class" value="impact.Impact"/>
                 <attribute name="Sealed" value="true"/>
             </manifest>
             <fileset dir=".">
