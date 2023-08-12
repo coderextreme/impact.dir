@@ -78,6 +78,7 @@ POSSIBILITY OF SUCH DAMAGE.
                     <exclude name="*.jar"/>
             </fileset>
 	 </jar>
+	 <echo>Now run `ant impact`, `ant Cell` and `ant Cell4x4`</echo>
     </target>
     <target name="impact" depends="default">
         <java classname="impact.Impact" classpath="impact.jar;.;images" fork="${fork}">

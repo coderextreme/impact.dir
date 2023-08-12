@@ -904,6 +904,8 @@ public class Impact extends JFrame implements WindowListener {
 				Cell.addCells();
 				InputStream is = null;
 				try {
+					// JNLP/JavaWebStart seems to be deprecated, but you are welcome to try
+					// If someone wants to make this work with OpenWebStart, be my guest.
 					//FileOpenService fos = (FileOpenService)ServiceManager.lookup("javax.jnlp.FileOpenService");
 					//FileContents fc = fos.openFileDialog(null, null);
 					//is = fc.getInputStream();
