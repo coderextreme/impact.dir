@@ -23,7 +23,7 @@ public class Cell extends Component implements MouseMotionListener, MouseListene
 	public static JButton ok = new JButton("OK");
 	public static JButton cancel = new JButton("Cancel");
 	Personality p = null;
-	public static String pClass = "impact.EmptyP";
+	public static String pClass = "net.coderextreme.impact.EmptyP";
 	int x = 0;
 	int y = 0;
 
@@ -119,7 +119,7 @@ public class Cell extends Component implements MouseMotionListener, MouseListene
 	}
 	public void mouseClicked(MouseEvent e) {
 		try {
-			if (pClass.equals("impact.Module")) {
+			if (pClass.equals("net.coderextreme.impact.Module")) {
 				setModulePersonalities(x, y);
 			} else if (x+Common.startx > 0 && y+Common.starty > 0 && x+Common.startx < Common.PMAXX-1 && y+Common.starty < Common.PMAXY-1) {
 				Personality p = (Personality)(Class.forName(pClass).getDeclaredConstructor().newInstance());
@@ -534,7 +534,7 @@ public class Cell extends Component implements MouseMotionListener, MouseListene
 		bg.add(jmi);
 		jmi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				pClass = "impact.Module";
+				pClass = "net.coderextreme.impact.Module";
 			}
 		});
 		jm.add(jmi);
@@ -542,7 +542,7 @@ public class Cell extends Component implements MouseMotionListener, MouseListene
 		bg.add(jmi);
 		jmi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				pClass = "impact.PassP";
+				pClass = "net.coderextreme.impact.PassP";
 			}
 		});
 		jm.add(jmi);
@@ -550,7 +550,7 @@ public class Cell extends Component implements MouseMotionListener, MouseListene
 		bg.add(jmi);
 		jmi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				pClass = "impact.LeftTurnP";
+				pClass = "net.coderextreme.impact.LeftTurnP";
 			}
 		});
 		jm.add(jmi);
@@ -558,7 +558,7 @@ public class Cell extends Component implements MouseMotionListener, MouseListene
 		bg.add(jmi);
 		jmi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				pClass = "impact.RightTurnP";
+				pClass = "net.coderextreme.impact.RightTurnP";
 			}
 		});
 		jm.add(jmi);
@@ -566,7 +566,7 @@ public class Cell extends Component implements MouseMotionListener, MouseListene
 		bg.add(jmi);
 		jmi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				pClass = "impact.LeftShiftP";
+				pClass = "net.coderextreme.impact.LeftShiftP";
 			}
 		});
 		jm.add(jmi);
@@ -574,7 +574,7 @@ public class Cell extends Component implements MouseMotionListener, MouseListene
 		bg.add(jmi);
 		jmi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				pClass = "impact.RightShiftP";
+				pClass = "net.coderextreme.impact.RightShiftP";
 			}
 		});
 		jm.add(jmi);
@@ -582,7 +582,7 @@ public class Cell extends Component implements MouseMotionListener, MouseListene
 		bg.add(jmi);
 		jmi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				pClass = "impact.CopyP";
+				pClass = "net.coderextreme.impact.CopyP";
 			}
 		});
 		jm.add(jmi);
@@ -590,7 +590,7 @@ public class Cell extends Component implements MouseMotionListener, MouseListene
 		bg.add(jmi);
 		jmi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				pClass = "impact.AndP";
+				pClass = "net.coderextreme.impact.AndP";
 			}
 		});
 		jm.add(jmi);
@@ -598,7 +598,7 @@ public class Cell extends Component implements MouseMotionListener, MouseListene
 		bg.add(jmi);
 		jmi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				pClass = "impact.MultAdderP";
+				pClass = "net.coderextreme.impact.MultAdderP";
 			}
 		});
 		jm.add(jmi);
@@ -606,7 +606,7 @@ public class Cell extends Component implements MouseMotionListener, MouseListene
 		bg.add(jmi);
 		jmi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				pClass = "impact.BitAdderP";
+				pClass = "net.coderextreme.impact.BitAdderP";
 			}
 		});
 		jm.add(jmi);
@@ -614,7 +614,7 @@ public class Cell extends Component implements MouseMotionListener, MouseListene
 		bg.add(jmi);
 		jmi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				pClass = "impact.EmptyP";
+				pClass = "net.coderextreme.impact.EmptyP";
 			}
 		});
 		jm.add(jmi);
@@ -622,7 +622,7 @@ public class Cell extends Component implements MouseMotionListener, MouseListene
 		bg.add(jmi);
 		jmi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				pClass = "impact.DontKnowP";
+				pClass = "net.coderextreme.impact.DontKnowP";
 			}
 		});
 		jm.add(jmi);
@@ -630,7 +630,7 @@ public class Cell extends Component implements MouseMotionListener, MouseListene
 		bg.add(jmi);
 		jmi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				pClass = "impact.BufferP";
+				pClass = "net.coderextreme.impact.BufferP";
 			}
 		});
 		jm.add(jmi);
@@ -638,7 +638,7 @@ public class Cell extends Component implements MouseMotionListener, MouseListene
 		bg.add(jmi);
 		jmi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				pClass = "impact.SortTopP";
+				pClass = "net.coderextreme.impact.SortTopP";
 			}
 		});
 		jm.add(jmi);
@@ -647,7 +647,7 @@ public class Cell extends Component implements MouseMotionListener, MouseListene
 		bg.add(jmi);
 		jmi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				pClass = "impact.SortBottomP";
+				pClass = "net.coderextreme.impact.SortBottomP";
 			}
 		});
 		jm.add(jmi);
@@ -655,7 +655,7 @@ public class Cell extends Component implements MouseMotionListener, MouseListene
 		bg.add(jmi);
 		jmi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				pClass = "impact.DivisionP";
+				pClass = "net.coderextreme.impact.DivisionP";
 			}
 		});
 		jm.add(jmi);
@@ -690,7 +690,7 @@ public class Cell extends Component implements MouseMotionListener, MouseListene
 	}
 	public static void openModule(BufferedReader br) {
 		try {
-			pClass = "impact.Module";
+			pClass = "net.coderextreme.impact.Module";
 			Common.MMAXX = Integer.parseInt(br.readLine());
 			Common.MMAXY = Integer.parseInt(br.readLine());
 			Common.modulePersonalities = new Personality[Common.MMAXX][Common.MMAXY];

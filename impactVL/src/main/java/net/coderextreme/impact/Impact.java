@@ -948,7 +948,7 @@ public class Impact extends JFrame implements WindowListener {
 									
 						Personality p = Common.cells[x][y].getPersonality();
 						if (p == null) {
-							modulearray[x][y] = cm.addModule(vm, "impact.EmptyP", me);
+							modulearray[x][y] = cm.addModule(vm, "net.coderextreme.impact.EmptyP", me);
 						} else {
 							String name = p.getClass().getName();
 							modulearray[x][y] = cm.addModule(vm, name, me);

@@ -1,15 +1,15 @@
-export CLASSPATH="impact.jar;.;images"
+export CLASSPATH="build;impact.jar;src/main/resources"
 
 impactVL: impact.jar
-	java -cp $(CLASSPATH) impact.Impact
+	java -cp $(CLASSPATH) net.coderextreme.impact.Impact
 
 4x4: impact.jar
-	java -cp $(CLASSPATH) impact.Cell 4x4
+	java -cp $(CLASSPATH) net.coderextreme.impact.Cell 4x4
 
 division: impact.jar
-	java -cp $(CLASSPATH) impact.Cell
+	java -cp $(CLASSPATH) net.coderextreme.impact.Cell
 
-impact.jar: impact/*java
-	javac -cp $(CLASSPATH) impact/*java
-	jar -cf impact.jar impact
-	(cd images; jar -uf ../impact.jar *gif)
+impact.jar: src/main/java/net/coderextreme/impact/*java
+	(cd src/main/java; javac -cp $(CLASSPATH) net/coderextreme/impact/*java)
+	(cd src/main/java; jar -cf ../../../impact.jar net)
+	(cd src/main/resources; jar -uf ../../../impact.jar *gif)
