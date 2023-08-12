@@ -54,7 +54,7 @@ POSSIBILITY OF SUCH DAMAGE.
     <target name="default">
 
 		<javac  srcdir="impact"
-			   destdir="impact"
+			   destdir="."
 			 classpath=".;images"
 		 includeantruntime="false"
 			   verbose="${javac.verbose}"
