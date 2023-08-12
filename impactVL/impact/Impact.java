@@ -7,7 +7,7 @@ import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
 
-class Module {
+class Module {  // aka Node
 	Vector endPoints; // links around outside of module
 	Vector links; // links between submodules
 	Vector modules; // submodules
@@ -245,7 +245,7 @@ class CreateModule extends Command {
 	public void mouseClicked(MouseEvent e) {
 		if (creating && e.getComponent() instanceof VisualMachine) {
 			VisualMachine vm = (VisualMachine)e.getComponent();
-			String modulename = javax.swing.JOptionPane.showInputDialog(vm, "Enter module name:", "Module");
+			String modulename = javax.swing.JOptionPane.showInputDialog(vm, "Enter node name:", "Node");
 			if (modulename == null) {
 				return;
 			}
@@ -350,7 +350,7 @@ class ExpandModule extends Command {
 			}
 			vm.getFrame().setVisible(true);
 		} else {
-			System.err.println("No module");
+			System.err.println("No node");
 		}
 	} 
 }
@@ -463,13 +463,13 @@ class VisualMachine extends JPanel implements MouseMotionListener {
 		addMouseMotionListener(this);
 	}
 	public void printLinks() {
-		ps.println("Module "+mainModule.getText()+" {");
+		ps.println("Node "+mainModule.getText()+" {");
 		Iterator i = links.iterator();
 		while (i.hasNext()) {
 			VisualLink l = (VisualLink)i.next();
 			VisualEndpoint frompt = l.from;
 			VisualEndpoint topt = l.to;
-			ps.println("\tLink from "+frompt.module.getText()+"."+frompt.module.module.id+"."+frompt.label+" to "+topt.module.getText()+"."+topt.module.module.id+"."+topt.label+";");
+			ps.println("\tRoute from "+frompt.module.getText()+"."+frompt.module.module.id+"."+frompt.label+" to "+topt.module.getText()+"."+topt.module.module.id+"."+topt.label+";");
 		}
 		ps.println("}");
 	}
@@ -528,7 +528,7 @@ class VisualMachine extends JPanel implements MouseMotionListener {
 			VisualEndpoint frompt = l.from;
 			VisualEndpoint topt = l.to;
 			if (frompt == vep || topt == vep) {
-				System.err.println("Cutting Link");
+				System.err.println("Cutting Route");
 				super.remove(frompt);
 				super.remove(topt);
 				i.remove();
@@ -561,12 +561,12 @@ class VisualMachine extends JPanel implements MouseMotionListener {
 	public int avoid(HashSet lines, int initial) {
 		int offset = 10; // offset between lines
 		int y = initial;
-		Integer i = new Integer(y);
+		Integer i = y;
 		int mult = 0;
 		int loop = 0;
 		do {
 			y = initial + offset * mult;
-			i = new Integer(y);
+			i = y;
 			if (loop % 2 == 0) {
 				mult++;
 			} else {
@@ -892,7 +892,7 @@ public class Impact extends JFrame implements WindowListener {
 				vm.getFrame().setVisible(true);
 			}
 		};
-		newmach.putValue(Action.NAME, "New Machine");
+		newmach.putValue(Action.NAME, "New Route Graph");
 		JMenuItem newmachine = new JMenuItem(newmach);
 		jm.add(newmachine);
 
@@ -981,7 +981,7 @@ public class Impact extends JFrame implements WindowListener {
 				vm.getFrame().setVisible(true);
 			}
 		};
-		openmach.putValue(Action.NAME, "Open Machine");
+		openmach.putValue(Action.NAME, "Open Route Graph");
 		JMenuItem openmachine = new JMenuItem(openmach);
 		jm.add(openmachine);
 
@@ -1040,7 +1040,7 @@ public class Impact extends JFrame implements WindowListener {
 				p.setCommand(cm);
 			}
 		};
-		newmod.putValue(Action.NAME, "New Module");
+		newmod.putValue(Action.NAME, "New Node");
 		JButton newmodbut = jtb.add(newmod);
 		bg.add(newmodbut);
 
@@ -1051,7 +1051,7 @@ public class Impact extends JFrame implements WindowListener {
 				cm.setCreating(false);
 			}
 		};
-		newlink.putValue(Action.NAME, "New Link");
+		newlink.putValue(Action.NAME, "New Route");
 		JButton newlinkbut = jtb.add(newlink);
 		bg.add(newlinkbut);
 
@@ -1064,7 +1064,7 @@ public class Impact extends JFrame implements WindowListener {
 			}
 		};
 
-		expand.putValue(Action.NAME, "Expand Module");
+		expand.putValue(Action.NAME, "Expand Node");
 		JButton expandbut = jtb.add(expand);
 		bg.add(expandbut);
 
@@ -1088,7 +1088,7 @@ public class Impact extends JFrame implements WindowListener {
 				p.setCommand(cpy);
 			}
 		};
-		copy.putValue(Action.NAME, "Put Module Reference in Clipboard");
+		copy.putValue(Action.NAME, "Put Node Reference in Clipboard");
 		JButton copybut = jtb.add(copy);
 		bg.add(copybut);
 

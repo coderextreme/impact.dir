@@ -122,7 +122,7 @@ public class Cell extends Component implements MouseMotionListener, MouseListene
 			if (pClass.equals("impact.Module")) {
 				setModulePersonalities(x, y);
 			} else if (x+Common.startx > 0 && y+Common.starty > 0 && x+Common.startx < Common.PMAXX-1 && y+Common.starty < Common.PMAXY-1) {
-				Personality p = (Personality)(Class.forName(pClass).newInstance());
+				Personality p = (Personality)(Class.forName(pClass).getDeclaredConstructor().newInstance());
 				Common.personalities[x+Common.startx][y+Common.starty] = p;
 				setPersonality(p);
 				repaint();
@@ -409,7 +409,7 @@ public class Cell extends Component implements MouseMotionListener, MouseListene
 			}
 		});
 		jm.add(jmi);
-		jmi = new JMenuItem("Open Module...");
+		jmi = new JMenuItem("Open Node...");
 		jmi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				JFileChooser jfc = new JFileChooser(System.getProperty("user.dir"));
@@ -429,7 +429,7 @@ public class Cell extends Component implements MouseMotionListener, MouseListene
 			}
 		});
 		jm.add(jmi);
-		jmi = new JMenuItem("Open Machine...");
+		jmi = new JMenuItem("Route Graph...");
 		jmi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				JFileChooser jfc = new JFileChooser(System.getProperty("user.dir"));
@@ -449,7 +449,7 @@ public class Cell extends Component implements MouseMotionListener, MouseListene
 			}
 		});
 		jm.add(jmi);
-		jmi = new JMenuItem("Save Module As...");
+		jmi = new JMenuItem("Save Node As...");
 		jmi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				JFileChooser jfc = new JFileChooser(System.getProperty("user.dir"));
@@ -530,7 +530,7 @@ public class Cell extends Component implements MouseMotionListener, MouseListene
 
 		jm = new JMenu("Create");
 		jmb.add(jm);
-		jmi = new JRadioButtonMenuItem("Module");
+		jmi = new JRadioButtonMenuItem("Node");
 		bg.add(jmi);
 		jmi.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
@@ -697,7 +697,7 @@ public class Cell extends Component implements MouseMotionListener, MouseListene
 			for (int y = 0; y < Common.MMAXY; y++) {
 				for (int x = 0; x < Common.MMAXX; x++) {
 					String pname = br.readLine();
-					Common.modulePersonalities[x][y] = (Personality)Class.forName(pname).newInstance();
+					Common.modulePersonalities[x][y] = (Personality)Class.forName(pname).getDeclaredConstructor().newInstance();
 					Common.modulePersonalities[x][y].lOutput = Boolean.parseBoolean(br.readLine());
 					Common.modulePersonalities[x][y].rOutput = Boolean.parseBoolean(br.readLine());
 					Common.modulePersonalities[x][y].tOutput = Boolean.parseBoolean(br.readLine());
