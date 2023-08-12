@@ -9,6 +9,8 @@ java -cp impact.jar net.coderextreme.impact.Impact
 java -cp impact.jar net.coderextreme.impact.Cell
 java -cp impact.jar net.coderextreme.impact.Cell Cell4x4
 
+java -jar impact.jar
+
 mvn clean install exec:java
 
 make impactVL
