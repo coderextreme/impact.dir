@@ -1,4 +1,4 @@
-package impact;
+package net.coderextreme.impact;
 import javax.swing.*;
 import java.awt.image.*;
 import java.awt.event.*;

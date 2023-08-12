@@ -1,4 +1,4 @@
-package impact;
+package net.coderextreme.impact;
 public class Common {
 
 	public static int PMAXX = 11;

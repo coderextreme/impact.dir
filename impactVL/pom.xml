@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>net.coderextreme</groupId>
+	<artifactId>impact</artifactId>
+	<version>2.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>impact</name>
+	<description>impact, A graph/grid/node/route editor and simulator</description>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<slf4j-version>1.7.12</slf4j-version>
+		<exec-maven-plugin.version>1.5.0</exec-maven-plugin.version>
+		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+		<maven-surefire-plugin.version>2.22.22</maven-surefire-plugin.version>
+	</properties>
+	<licenses>
+		<license>
+			<name>Open-Source Software License</name>
+			<url>LICENSE</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>mvn-plugins</id>
+			<name>mvnplugins-release</name>
+			<url>https://mvnrepository.com/artifacts</url>
+		</pluginRepository>
+	</pluginRepositories>
+	<repositories>
+		<repository>
+			<id>mvn</id>
+			<name>mvnlibs-release</name>
+			<url>https://mvnrepository.com/artifacts</url>
+		</repository>
+		<repository>
+			<id>sonatype-nexus</id>
+			<url>https://oss.sonatype.org/content/groups/public</url>
+		</repository>
+	</repositories>
+	<dependencies>
+	</dependencies>
+
+	<build>
+		<defaultGoal>install</defaultGoal>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+			<resource>
+				<directory>images</directory>
+			</resource>
+		</resources>
+
+		<plugins>
+		      <plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-source-plugin</artifactId>
+			<version>3.3.0</version>
+			<executions>
+			  <execution>
+			    <id>attach-sources</id>
+			    <phase>verify</phase>
+			    <goals>
+			      <goal>jar-no-fork</goal>
+			    </goals>
+			  </execution>
+			</executions>
+		      </plugin>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
+				<configuration>
+					<source>20</source>
+					<target>20</target>
+					<fork>true</fork>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+				    <archive>
+					<manifest>
+					    <addClasspath>true</addClasspath>
+					    <classpathPrefix>.</classpathPrefix>
+					    <mainClass>net.coderextreme.impact.Impact</mainClass>
+					</manifest>
+				    </archive>
+				</configuration>
+			</plugin>
+		        <plugin>
+			    <groupId>org.codehaus.mojo</groupId>
+			    <artifactId>exec-maven-plugin</artifactId>
+			    <version>1.2.1</version>
+			    <configuration>
+				<mainClass>net.coderextreme.impact.Impact</mainClass>
+			    </configuration>
+			</plugin>
+			<plugin>
+
+		<artifactId>maven-assembly-plugin</artifactId>
+		<executions>
+		  <execution>
+		    <phase>package</phase>
+		    <goals>
+		      <goal>single</goal>
+		    </goals>
+		  </execution>
+		</executions>
+		<configuration>
+		  <archive>
+                	<manifest>
+				<mainClass>net.coderextreme.impact.Impact</mainClass>
+                	</manifest>
+                </archive>
+		  <descriptorRefs>
+		    <descriptorRef>jar-with-dependencies</descriptorRef>
+		  </descriptorRefs>
+		</configuration>
+	      </plugin>
+            </plugins>
+	</build>
+</project>

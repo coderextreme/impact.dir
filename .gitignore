@@ -1,6 +1,9 @@
 # Compiled class file
 *.class
 
+# jars
+target/
+
 # Log file
 *.log
 

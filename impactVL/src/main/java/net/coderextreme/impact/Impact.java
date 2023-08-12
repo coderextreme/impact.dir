@@ -1,5 +1,4 @@
-package impact;
-import impact.*;
+package net.coderextreme.impact;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;

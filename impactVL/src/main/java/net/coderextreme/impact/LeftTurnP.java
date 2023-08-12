@@ -1,4 +1,4 @@
-package impact;
+package net.coderextreme.impact;
 import java.awt.*;
 
 public class LeftTurnP extends Personality {

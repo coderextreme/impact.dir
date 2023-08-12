@@ -1,4 +1,4 @@
-package impact;
+package net.coderextreme.impact;
 public class EmptyP extends Personality {
 	public void step(int x, int y) {
 	}

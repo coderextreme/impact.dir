@@ -1,4 +1,4 @@
-package impact;
+package net.coderextreme.impact;
 public class Division {
 	private static int NUMDECIMALDIGITS = 16;
 	static public void main(String args[]) throws Exception {

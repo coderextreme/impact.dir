@@ -1,4 +1,4 @@
-package impact;
+package net.coderextreme.impact;
 import java.awt.*;
 
 class FlagTopP extends Personality {

@@ -1,4 +1,4 @@
-package impact;
+package net.coderextreme.impact;
 import java.awt.*;
 import javax.swing.*;
 

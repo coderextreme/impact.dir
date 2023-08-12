@@ -1,4 +1,4 @@
-package impact;
+package net.coderextreme.impact;
 import java.awt.*;
 
 public class RightShiftP extends Personality {

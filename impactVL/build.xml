@@ -44,19 +44,22 @@ POSSIBILITY OF SUCH DAMAGE.
 
 <project name="Impact" default="default" basedir=".">
     <description>Builds, tests, and runs the ImpactVL project.</description>
-    <property name="fork"                value="true"/>    <!-- note that Netbeans default path is built in and has to be overridden by going to     -->
+    <property name="fork"                value="true"/>
+    <!--
     <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+    -->
     <property name="impact.jar"     value="impact.jar"/>
     <property name="javac.verbose"              value="true"/>
-    <property name="java.classes.dir"        value="impact"/>
+    <property name="java.classes.dir"        value="net"/>
     <target name="all" depends="default,impact"/>
 
     <target name="default">
+	    <mkdir dir="build"/>
 
-		<javac  srcdir="impact"
-			   destdir="."
-			 classpath=".;images"
-		 includeantruntime="false"
+	    <javac  srcdir="src/main/java/net/coderextreme/impact"
+			   destdir="build"
+	    		   classpath="build;src/main/java;impact.jar"
+		 	   includeantruntime="false"
 			   verbose="${javac.verbose}"
 			   fork="${fork}">
 		</javac>
@@ -68,28 +71,32 @@ POSSIBILITY OF SUCH DAMAGE.
                 <attribute name="Implementation-Vendor" value="John Carlson"/>
                 <attribute name="Implementation-Title" value="ImpactVL"/>
                 <attribute name="Implementation-Version" value="2.0"/>
-                <attribute name="Main-Class" value="impact.Impact"/>
+                <attribute name="Main-Class" value="net.coderextreme.impact.Impact"/>
                 <attribute name="Sealed" value="true"/>
             </manifest>
-            <fileset dir=".">
-		    <include name="**/*.class"/>
-		    <include name="**/images/*.gif"/>
+	    <fileset dir=".">
 		    <include name="**/sort*"/>
-                    <exclude name="*.jar"/>
+            </fileset>
+	    <fileset dir="src/main/java">
+		    <include name="**/*.class"/>
+		    <include name="**/*.java"/>
+            </fileset>
+	    <fileset dir="src/main/resources">
+		    <include name="**/*.gif"/>
             </fileset>
 	 </jar>
 	 <echo>Now run `ant impact`, `ant Cell` and `ant Cell4x4`</echo>
     </target>
     <target name="impact" depends="default">
-        <java classname="impact.Impact" classpath="impact.jar;.;images" fork="${fork}">
+        <java classname="net.coderextreme.impact.Impact" classpath="build;impact.jar;src/main/resources/" fork="${fork}">
 	</java>
     </target>
     <target name="Cell" depends="default">
-	<java classname="impact.Cell" classpath="impact.jar;.;images" fork="${fork}">
+	<java classname="net.coderextreme.impact.Cell" classpath="build;impact.jar;src/main/resources/" fork="${fork}">
 	</java>
     </target>
     <target name="Cell4x4" depends="default">
-	<java classname="impact.Cell" classpath="impact.jar;.;images" fork="${fork}">
+	    <java classname="net.coderextreme.impact.Cell" classpath="build;impact.jar;src/main/resources/" fork="${fork}">
 		<arg value="4x4"/>
 	</java>
     </target>
