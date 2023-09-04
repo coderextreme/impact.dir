@@ -1,5 +1,9 @@
 There are a variety of things to try from the command-line:
 ```bash
+make impactVL
+make division
+make 4x4
+
 ant
 ant impact
 ant Cell
@@ -9,9 +13,7 @@ java -cp impact.jar net.coderextreme.impact.Impact
 java -cp impact.jar net.coderextreme.impact.Cell
 java -cp impact.jar net.coderextreme.impact.Cell Cell4x4
 
-mvn clean install exec:java
+java -jar impact.jar
 
-make impactVL
-make division
-make 4x4
+mvn clean install exec:java
 ```
