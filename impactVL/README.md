@@ -57,6 +57,6 @@ Plus ways to remove data by adding a - in front or behind the label and a leadin
 This needs to be generalized. Think how to do hypergraphs. More verbose would be an option,
 IDK, i don’t want to reinvent a document format.
 
-Good question about BVH!  I am proposing a new mocap format that doesn’t need a hierarchy, and can do streaming, graph or grid data.
+I am proposing a new mocap format that doesn’t need a hierarchy, and can do streaming, graph or grid data.
 
 Inspired by Katy Schildmeyer's Joint Location format.
