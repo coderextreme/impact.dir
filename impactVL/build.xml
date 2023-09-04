@@ -49,7 +49,7 @@ POSSIBILITY OF SUCH DAMAGE.
     <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
     -->
     <property name="impact.jar"     value="impact.jar"/>
-    <property name="javac.verbose"              value="true"/>
+    <property name="javac.verbose"              value="false"/>
     <property name="java.classes.dir"        value="net"/>
     <target name="all" depends="default,impact"/>
 

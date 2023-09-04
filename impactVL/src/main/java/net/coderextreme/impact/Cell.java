@@ -28,9 +28,12 @@ public class Cell extends Component implements MouseMotionListener, MouseListene
 	int y = 0;
 
 	public Cell(int x, int y) {
-		super.setBackground(Color.white);
+		super();
 		this.x = x;
 		this.y = y;
+	}
+	public Cell() {
+		super.setBackground(Color.white);
 		addKeyListener(this);
 		addMouseMotionListener(this);
 		addMouseListener(this);
@@ -158,9 +161,9 @@ public class Cell extends Component implements MouseMotionListener, MouseListene
 	}
 	public void paint(Graphics g) {
 		g.setFont(new Font("Helvetica", Font.PLAIN, M - 2));
-		g.setColor(Color.white);
+		// g.setColor(Color.white);
 		super.paint(g);
-		g.fillRect(0,0,5*M,5*M);
+		// g.fillRect(0,0,5*M,5*M);
 		g.setColor(Color.black);
 		if (p != null) {
 			p.paint(g);

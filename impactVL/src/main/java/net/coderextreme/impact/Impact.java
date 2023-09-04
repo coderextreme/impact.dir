@@ -6,8 +6,10 @@ import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.net.URL;
+import net.coderextreme.impact.*;
 
-class Module {  // aka Node
+class Module implements Cloneable {  // aka Node
 	Vector endPoints; // links around outside of module
 	Vector links; // links between submodules
 	Vector modules; // submodules
@@ -24,6 +26,12 @@ class Module {  // aka Node
 		links = new Vector();
 		modules = new Vector();
 		id = idsequence++;
+	}
+	public Module() {
+		this("Node");
+	}
+	public Object clone() {
+		return new Module(name);
 	}
 	public void addModule(Module m) {
 		modules.addElement(m);
@@ -88,6 +96,37 @@ class AcquireLabel {
 		return end;
 	}
 }
+
+class Select {
+    public static String ask(VisualMachine vm, String prompt, String clazzname,  ButtonGroup bg) {
+
+        String result = "EmptyP";
+
+        if (EventQueue.isDispatchThread()) {
+
+            JPanel panel = new JPanel();
+            panel.add(new JLabel(prompt));
+            DefaultComboBoxModel model = new DefaultComboBoxModel();
+	    Enumeration<AbstractButton> i = bg.getElements();
+	    while (i.hasMoreElements()) {
+		String option = i.nextElement().getText();
+		System.err.println("Adding option "+option);
+                model.addElement(option);
+            }
+            JComboBox comboBox = new JComboBox(model);
+	    comboBox.setSelectedItem(clazzname);
+            panel.add(comboBox);
+
+            int iResult = JOptionPane.showConfirmDialog(vm, panel, prompt, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+            switch (iResult) {
+                case JOptionPane.OK_OPTION:
+        	   result = (String) comboBox.getSelectedItem();
+            }
+        }
+	return result;
+    }
+}
+
 class VisualEndpoint extends JLabel implements Rectangular {
 	VisualModule module;
 	VisualLink link;
@@ -137,18 +176,32 @@ class VisualLink {
 
 class VisualModule extends JLabel implements Rectangular {
 	Module module;
+	Cell cell;
 	VisualMachine machine; // vm module is in 
 	VisualMachine parent; // opened up vm of module
 	HashSet rightLines = new HashSet();
 	HashSet leftLines = new HashSet();
 	HashSet topLines = new HashSet();
 	HashSet bottomLines = new HashSet();
-	public VisualModule(String text) {
-		super(text);
+	public VisualModule(String clazzName) {
+		super("");
+		// We don't need this as Cell draw it
+		String text = clazzName != null ? (clazzName.lastIndexOf(".") > 0 ? clazzName.substring(clazzName.lastIndexOf(".")+1) : clazzName ) : "Node";
 		module = new Module(text);
+		if (text != null) {
+			System.err.println("cell "+clazzName);
+			// Do not specify a URL. TODO
+			URL icon = this.getClass().getClassLoader().getResource(text+".gif");
+			if (icon != null) {
+				System.err.println("Setting "+text+" icon url "+icon.toString());
+				setIcon(new ImageIcon(icon, text));
+				ImageIcon clicon = (ImageIcon)getIcon();
+				clicon.setImage(clicon.getImage().getScaledInstance(75, 75,Image.SCALE_DEFAULT));
+			}
+		}
 	}
 	public VisualModule(Module mod) {
-		super(mod.name);
+		this(mod.name);
 		module = mod;
 	}
 	public void init(VisualMachine vm, MouseEvent e, Selecter s, Placer p) {
@@ -157,13 +210,45 @@ class VisualModule extends JLabel implements Rectangular {
 		addMouseListener(p);
 		addMouseMotionListener(s);
 		setBorder(new BevelBorder(BevelBorder.RAISED));
-		setSize(75,25);
+		setSize(75,75);
 		setLocation(e.getX(), e.getY());
+		cell = setModulePersonality(e);
 		vm.add(this);
 
 		vm.invalidate();
 		vm.validate();
 		vm.repaint();
+	}
+	public Cell setModulePersonality(MouseEvent e) {
+		// creates a personality from current pClass
+		Cell c = new Cell(e.getX(), e.getY());
+		try {
+			Personality p = (Personality)(Class.forName("net.coderextreme.impact."+Impact.pClass).getDeclaredConstructor().newInstance());
+			if (p != null) {
+				c.setPersonality(p);
+			} else {
+				System.err.println("Class not found, continuing with image, if found");
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			System.err.println("Can't set cell personality in CreateModule.setModulePersonality, skipping");
+		}
+		c.repaint();
+		return c;
+	}
+	public void paint(Graphics g) {
+		super.paint(g);
+		try {
+			Icon icon = getIcon();
+			if (icon != null) {
+				icon.paintIcon(this, g, getX(), getX());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if (cell != null) {
+			cell.paint(g);
+		}
 	}
 	public void setMachine(VisualMachine vm) {
 		machine = vm;
@@ -234,10 +319,12 @@ class Command implements MouseListener, MouseMotionListener {
 class CreateModule extends Command {
 	Selecter s;
 	Placer p;
+	ButtonGroup bg;
 	boolean creating = false;
-	public CreateModule(Selecter s, Placer p) {
+	public CreateModule(Selecter s, Placer p, ButtonGroup bg) {
 		this.s = s;
 		this.p = p;
+		this.bg = bg;
 	}
 	public void setCreating(boolean b) {
 		creating = b;
@@ -245,7 +332,10 @@ class CreateModule extends Command {
 	public void mouseClicked(MouseEvent e) {
 		if (creating && e.getComponent() instanceof VisualMachine) {
 			VisualMachine vm = (VisualMachine)e.getComponent();
-			String modulename = javax.swing.JOptionPane.showInputDialog(vm, "Enter node name:", "Node");
+			// String modulename = "net.coderextreme.impact."+Select.ask(vm, "Enter node class or image:", Impact.pClass, bg);
+			// String modulename = javax.swing.JOptionPane.showInputDialog(vm, "Enter node name:", Impact.pClass);
+			String modulename = Impact.pClass;
+
 			if (modulename == null) {
 				return;
 			}
@@ -285,6 +375,7 @@ class Cut extends Command {
 	}
 }
 	
+// Not Used
 class CutLink extends Command {
 	public void mousePressed(MouseEvent e) {
 		Component c = e.getComponent();
@@ -308,6 +399,8 @@ class Copy extends Command {
 		if (c instanceof VisualModule) {
 			VisualModule mod = (VisualModule)c;
 			s.setClipboard(mod);
+		} else {
+			System.err.println("Not cutting a Node.");
 		}
 	}
 }
@@ -327,6 +420,8 @@ class Paste extends Command {
 			if (clipboard != null) {
 				VisualMachine vm = (VisualMachine)e.getComponent();
 				cm.addModule(vm, clipboard, e);
+			} else {
+				System.err.println("Nothing in clipboard");
 			}
 		}
 	}
@@ -369,7 +464,7 @@ class CreateLink {
 	}
 	public void link(VisualModule frommod, VisualModule tomod) {
 		if (linking) {
-			VisualMachine.link(frommod, tomod, new AcquireLabel("from", true), new AcquireLabel("to", true), p);
+			VisualMachine.link(frommod, tomod, new AcquireLabel("out", true), new AcquireLabel("in", true), p);
 		}
 	}
 }
@@ -443,7 +538,6 @@ class VisualMachine extends JPanel implements MouseMotionListener {
 	int my;
 	JFrame frame;
 	Selecter selecter;
-	PrintStream ps = System.out;
 	static Vector machines = new Vector();
 	public VisualMachine(VisualModule mod, Placer p, Selecter s) {
 		mainModule = mod;
@@ -462,7 +556,7 @@ class VisualMachine extends JPanel implements MouseMotionListener {
 		addMouseListener(p);
 		addMouseMotionListener(this);
 	}
-	public void printLinks() {
+	public void saveLinks(PrintStream ps) {
 		ps.println("Node "+mainModule.getText()+" {");
 		Iterator i = links.iterator();
 		while (i.hasNext()) {
@@ -473,11 +567,11 @@ class VisualMachine extends JPanel implements MouseMotionListener {
 		}
 		ps.println("}");
 	}
-	static public void printMachines() {
+	static public void saveMachines(PrintStream ps) {
 		Iterator m = machines.iterator();
 		while (m.hasNext()) {
 			VisualMachine vm = (VisualMachine)m.next();
-			vm.printLinks();
+			vm.saveLinks(ps);
 		}
 	}
 	public void addLink(VisualLink l) {
@@ -869,12 +963,14 @@ public class Impact extends JFrame implements WindowListener {
 	Cut ct;
 	Copy cpy;
 	Paste paste;
+	public static String pClass = "EmptyP";
 	public void init() {
 		getContentPane().setLayout(new BorderLayout());
 		p = new Placer();
 		CreateLink cl = new CreateLink(p);
 		s = new Selecter(cl);
-		cm = new CreateModule(s, p);
+		ButtonGroup bgNodeClasses = new ButtonGroup();
+		cm = new CreateModule(s, p, bgNodeClasses);
 		em = new ExpandModule(s, p);
 		ct = new Cut(s);
 		cpy = new Copy(s, p);
@@ -909,7 +1005,7 @@ public class Impact extends JFrame implements WindowListener {
 					//FileOpenService fos = (FileOpenService)ServiceManager.lookup("javax.jnlp.FileOpenService");
 					//FileContents fc = fos.openFileDialog(null, null);
 					//is = fc.getInputStream();
-					is = new FileInputStream("machineoutput");
+					is = new FileInputStream("machineoutput.rg");
 				} catch (Exception e) {
 					try {
 						JFileChooser jfc = new JFileChooser(System.getProperty("user.dir"));
@@ -926,62 +1022,62 @@ public class Impact extends JFrame implements WindowListener {
 						return;
 					}
 				}
-				try {
-					BufferedReader br = new BufferedReader(new InputStreamReader(is));
-					Cell.openMachine(br);
-					br.close();
-					is.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-					return;
+		try {
+			BufferedReader br = new BufferedReader(new InputStreamReader(is));
+			Cell.openMachine(br);
+			br.close();
+			is.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return;
+		}
+		int id = 0;
+		VisualModule [][] modulearray = new VisualModule[Common.PMAXX][Common.PMAXY];
+		for (int y = 0; y < Common.PMAXY; y++) {
+			for (int x = 0; x < Common.PMAXX; x++) {
+				MouseEvent me = new MouseEvent(
+					vm,
+					id++,
+					System.currentTimeMillis(),
+					0, x*150, y*50,
+					1, false);
+							
+				Personality p = Common.cells[x][y].getPersonality();
+				if (p == null) {
+					modulearray[x][y] = cm.addModule(vm, "EmptyP", me);
+				} else {
+					String name = p.getClass().getName();
+					modulearray[x][y] = cm.addModule(vm, name, me);
 				}
-				int id = 0;
-				VisualModule [][] modulearray = new VisualModule[Common.PMAXX][Common.PMAXY];
-				for (int y = 0; y < Common.PMAXY; y++) {
-					for (int x = 0; x < Common.PMAXX; x++) {
-						MouseEvent me = new MouseEvent(
-							vm,
-							id++,
-							System.currentTimeMillis(),
-							0, x*150, y*50,
-							1, false);
-									
-						Personality p = Common.cells[x][y].getPersonality();
-						if (p == null) {
-							modulearray[x][y] = cm.addModule(vm, "net.coderextreme.impact.EmptyP", me);
-						} else {
-							String name = p.getClass().getName();
-							modulearray[x][y] = cm.addModule(vm, name, me);
-						}
+			}
+		}
+		for (int y = 0; y < Common.PMAXY; y++) {
+			for (int x = 0; x < Common.PMAXX; x++) {
+				if (y < Common.PMAXY-1 && x > 0 && x < Common.PMAXX-1 ) {
+					VisualMachine.link(modulearray[x][y],
+							modulearray[x][y+1],
+							new AcquireLabel("out", false),
+							new AcquireLabel("in", false),
+							p);
+					VisualMachine.link(modulearray[x][y+1],
+							modulearray[x][y],
+							new AcquireLabel("out", false),
+							new AcquireLabel("in", false),
+							p);
+				}
+				if (x < Common.PMAXX-1 && y > 0 && y < Common.PMAXY-1 ) {
+					VisualMachine.link(modulearray[x][y],
+							modulearray[x+1][y],
+							new AcquireLabel("out", false),
+							new AcquireLabel("in", false),
+							p);
+					VisualMachine.link(modulearray[x+1][y],
+							modulearray[x][y],
+							new AcquireLabel("out", false),
+							new AcquireLabel("in", false),
+							p);
 					}
 				}
-				for (int y = 0; y < Common.PMAXY; y++) {
-					for (int x = 0; x < Common.PMAXX; x++) {
-						if (y < Common.PMAXY-1 && x > 0 && x < Common.PMAXX-1 ) {
-							VisualMachine.link(modulearray[x][y],
-									modulearray[x][y+1],
-									new AcquireLabel("bottom", false),
-									new AcquireLabel("top", false),
-									p);
-							VisualMachine.link(modulearray[x][y+1],
-									modulearray[x][y],
-									new AcquireLabel("top", false),
-									new AcquireLabel("bottom", false),
-									p);
-						}
-						if (x < Common.PMAXX-1 && y > 0 && y < Common.PMAXY-1 ) {
-							VisualMachine.link(modulearray[x][y],
-									modulearray[x+1][y],
-									new AcquireLabel("right", false),
-									new AcquireLabel("left", false),
-									p);
-							VisualMachine.link(modulearray[x+1][y],
-									modulearray[x][y],
-									new AcquireLabel("left", false),
-									new AcquireLabel("right", false),
-									p);
-						}
-					}
 				}
 				vm.getFrame().setVisible(true);
 			}
@@ -993,7 +1089,25 @@ public class Impact extends JFrame implements WindowListener {
 		AbstractAction saveact = new AbstractAction() {
 			public void actionPerformed(ActionEvent ae) {
 				System.err.println(getValue(NAME));
-				VisualMachine.printMachines();
+				JFileChooser jfc = new JFileChooser(System.getProperty("user.dir"));
+				jfc.setDialogType(JFileChooser.SAVE_DIALOG);
+				jfc.removeChoosableFileFilter(jfc.getAcceptAllFileFilter());
+				jfc.setFileFilter(new FileNameExtensionFilter("Files ending in .rg", "rg"));
+
+				int rv = jfc.showOpenDialog(null);
+				PrintStream ps;
+				if (rv != JFileChooser.APPROVE_OPTION) {
+					ps = System.out;
+					return;
+				} else {
+					try {
+						ps = new PrintStream(new FileOutputStream(jfc.getSelectedFile())); 
+					} catch (Exception exfo) {
+						ps = System.out;
+						exfo.printStackTrace();
+					}
+				}
+				VisualMachine.saveMachines(ps);
 			}
 		};
 		saveact.putValue(Action.NAME, "Save");
@@ -1006,10 +1120,82 @@ public class Impact extends JFrame implements WindowListener {
 				System.exit(0);
 			}
 		};
+
 		quitact.putValue(Action.NAME, "Quit");
 		JMenuItem quit = new JMenuItem(quitact);
 		jm.add(quit);
 
+
+		/////////////////////////////////////////////////////////////////
+		JMenu jm2 = new JMenu("Edit");
+		jmb.add(jm2);
+
+
+		AbstractAction cutact = new AbstractAction() {
+			public void actionPerformed(ActionEvent ae) {
+				System.err.println(getValue(NAME));
+				s.setLinking(false);
+				cm.setCreating(false);
+				p.setCommand(ct);
+			}
+		};
+
+		cutact.putValue(Action.NAME, "Cut");
+		JMenuItem cutmi = new JMenuItem(cutact);
+		jm2.add(cutmi);
+
+		AbstractAction copyact = new AbstractAction() {
+			public void actionPerformed(ActionEvent ae) {
+				System.err.println(getValue(NAME));
+				s.setLinking(false);
+				cm.setCreating(false);
+				p.setCommand(cpy);
+			}
+		};
+
+		copyact.putValue(Action.NAME, "Copy");
+		JMenuItem copymi = new JMenuItem(copyact);
+		jm2.add(copymi);
+
+		AbstractAction pasteact = new AbstractAction() {
+			public void actionPerformed(ActionEvent ae) {
+				System.err.println(getValue(NAME));
+				s.setLinking(false);
+				cm.setCreating(false);
+				p.setCommand(paste);
+			}
+		};
+
+		pasteact.putValue(Action.NAME, "Paste");
+		JMenuItem pastemi = new JMenuItem(pasteact);
+		jm2.add(pastemi);
+		jmb.add(jm2);
+
+		// From Cell.java
+		JMenu jm3 = new JMenu("Create");
+		jmb.add(jm3);
+
+		String [] clazzList = new String [] {
+			"AndP",
+			"BitAdderP",
+			"BufferP",
+			"CopyP",
+			"DivisionP",
+			"DontKnowP",
+			"EmptyP",
+			"LeftShiftP",
+			"LeftTurnP",
+			"MultAdderP",
+			"PassP",
+			"RightShiftP",
+			"RightTurnP",
+			"SortBottomP",
+			"SortTopP"
+		};
+
+		for (int c = 0; c < clazzList.length; c++) {
+			createRadio(jm3, clazzList[c], bgNodeClasses);
+		}
 		setJMenuBar(jmb);
 
 
@@ -1081,7 +1267,7 @@ public class Impact extends JFrame implements WindowListener {
 				p.setCommand(ct);
 			}
 		};
-		cut.putValue(Action.NAME, "Cut");
+		cut.putValue(Action.NAME, "Cut Reference to Clipboard");
 		JButton cutbut = jtb.add(cut);
 		bg.add(cutbut);
 
@@ -1093,11 +1279,11 @@ public class Impact extends JFrame implements WindowListener {
 				p.setCommand(cpy);
 			}
 		};
-		copy.putValue(Action.NAME, "Put Node Reference in Clipboard");
+		copy.putValue(Action.NAME, "Copy Reference to Clipboard");
 		JButton copybut = jtb.add(copy);
 		bg.add(copybut);
 
-		AbstractAction pasteact = new AbstractAction() {
+		AbstractAction pasteaction = new AbstractAction() {
 			public void actionPerformed(ActionEvent ae) {
 				System.err.println(getValue(NAME));
 				s.setLinking(false);
@@ -1105,13 +1291,23 @@ public class Impact extends JFrame implements WindowListener {
 				p.setCommand(paste);
 			}
 		};
-		pasteact.putValue(Action.NAME, "Copy Reference from Clipboard");
-		JButton pastebut = jtb.add(pasteact);
+		pasteaction.putValue(Action.NAME, "Paste Reference from Clipboard");
+		JButton pastebut = jtb.add(pasteaction);
 		bg.add(pastebut);
 
 		pack();
 		setVisible(true);
 		addWindowListener(this);
+	}
+	public void createRadio(JMenu jm, String clazz, ButtonGroup bgNodeClasses) {
+		JRadioButtonMenuItem jmi = new JRadioButtonMenuItem(clazz);
+		bgNodeClasses.add(jmi);
+		jmi.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				pClass = clazz;
+			}
+		});
+		jm.add(jmi);
 	}
 
 	public void windowActivated(WindowEvent e) {}
