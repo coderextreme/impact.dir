@@ -693,7 +693,12 @@ public class Cell extends Component implements MouseMotionListener, MouseListene
 			for (int y = 0; y < Common.MMAXY; y++) {
 				for (int x = 0; x < Common.MMAXX; x++) {
 					String pname = (String)ois.readObject();
-					Common.modulePersonalities[x][y] = (Personality)Class.forName(pname).newInstance();
+					try {
+						Common.modulePersonalities[x][y] = (Personality)Class.forName(pname).newInstance();
+					} catch (ClassNotFoundException e) {
+						pname = "impact."+pname;
+						Common.modulePersonalities[x][y] = (Personality)Class.forName(pname).newInstance();
+					}
 					Common.modulePersonalities[x][y].lOutput = ois.readBoolean();
 					Common.modulePersonalities[x][y].rOutput = ois.readBoolean();
 					Common.modulePersonalities[x][y].tOutput = ois.readBoolean();
@@ -752,8 +757,14 @@ public class Cell extends Component implements MouseMotionListener, MouseListene
 			for (int y = 0; y < Common.PMAXY; y++) {
 				for (int x = 0; x < Common.PMAXX; x++) {
 					Common.cells[x][y] = new Cell(x, y);
+					Personality p = null;
 					String pname = (String)ois.readObject();
-					Personality p = (Personality)Class.forName(pname).newInstance();
+					try {
+						p = (Personality)Class.forName(pname).newInstance();
+					} catch (ClassNotFoundException e) {
+						pname = "impact."+pname;
+						p = (Personality)Class.forName(pname).newInstance();
+					}
 					if (p == null) {
 						p = new EmptyP();
 					}
